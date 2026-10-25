@@ -1,0 +1,239 @@
+<!DOCTYPE html><html>
+<head>
+  <title>Type Desk</title>  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+    }
+   /* LOGIN PAGE  */
+#loginPage {
+  background: linear-gradient(135deg, #879fc0fb, #BDDDFC, #88BDF2);
+  height: 100vh;
+}
+/* MODE PAGE */
+#modePage {
+  background: linear-gradient(135deg, #272757, #8686AC, #505081);
+  height: 100vh;
+}
+    .center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: white;
+      color: black;
+      padding: 30px;
+      border-radius: 12px;
+      width: 300px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      width: 85%;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      background: #8a8a8a;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #000000;
+    }
+    .hidden { display: none; }
+    .game-box {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 120px;
+      margin-top: 20px;
+      font-size: 18px;
+      border-radius: 8px;
+    }
+    .correct { color: #0d5025; }
+    .wrong { color: #8d0e0e; }
+    .stats {
+      margin-top: 10px;
+    }
+    #gamePage {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #4A4A4A, #CBCBCB, #6D8196);
+  color: #130c07;
+}
+  </style></head><body><!-- LOGIN --><div id="loginPage" class="center">
+  <div class="card">
+    <h2>Type Desk</h2>
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <input id="color" placeholder="Favourite Color">
+    <button id="loginBtn">Login / Register</button>
+    <button id="forgotBtn">Forgot Password?</button>
+  </div>
+</div><!-- MODE --><div id="modePage" class="hidden center">
+  <div class="card">
+    <h2 id="welcome"></h2>
+    <button onclick="startGame('easy')">Easy</button>
+    <button onclick="startGame('medium')">Medium</button>
+    <button onclick="startGame('hard')">Hard</button>
+    <button onclick="startGame('extreme')">Extreme</button>
+  </div>
+</div><!-- GAME --><div id="gamePage" class="hidden">
+  <div class="game-box">
+    <h2 id="modeTitle"></h2>
+    <h3>Level: <span id="level">1</span></h3>
+    <p id="text"></p><textarea id="input"></textarea>
+
+<div class="stats">
+  ⏱ Time: <span id="time">30</span>s |
+  🎯 Accuracy: <span id="accuracy">0</span>% |
+  🏆 Score: <span id="score">0</span>
+</div>
+<button onclick="nextLevel()">Next Level</button>
+<button onclick="restart()">Restart</button>
+<button onclick="goBack()">⬅ Back</button>
+  </div>
+</div><script>
+window.onload=function(){
+let score=0,correctChars=0,totalChars=0;
+const username=document.getElementById("username");
+const password=document.getElementById("password");
+const color=document.getElementById("color");
+
+// LOGIN
+document.getElementById("loginBtn").onclick=function(){
+const user=username.value;
+const pass=password.value;
+const col=color.value;
+if(!user||!pass||!col){alert("Fill all");return;}
+const stored=localStorage.getItem(user);
+if(!stored){
+localStorage.setItem(user,JSON.stringify({password:pass,color:col}));
+}else{
+const data=JSON.parse(stored);
+if(data.password!==pass){
+alert("Wrong password!");
+return;
+}
+}
+document.getElementById("welcome").innerText="Welcome, "+user+" 👋";
+loginPage.classList.add("hidden");
+modePage.classList.remove("hidden");
+};
+
+// FORGOT
+document.getElementById("forgotBtn").onclick=function(){
+const user=prompt("Enter username:");
+const stored=localStorage.getItem(user);
+if(!stored){alert("User not found");return;}
+const col=prompt("Enter favourite color:");
+const data=JSON.parse(stored);
+if(data.color===col){
+alert("Password: "+data.password);
+}else{
+alert("Wrong color");
+}
+};
+// DATA
+const dataSet={
+easy:["Cat runs.","Sun is bright.","Dog plays.","Sky blue.","Water clear.","Trees green.","Fish swim.","Practice daily.","Typing fun.","Stay consistent."],
+medium:["Do not look at keyboard while typing","Learning typing takes time and patience","Keep your fingers relaxed and type smoothly","Stay focused and avoid making small mistakes","Avoid distractions while typing to maintain better focus","Confidence in typing comes with regular daily practice","Consistent typing practice improves both speed and accuracy","Try to type without stopping or correcting too often","Regular practice helps build strong muscle memory","Try to type without stopping or correcting too often"],
+hard:["Using proper finger placement on the keyboard is very important. It helps in reducing errors and improves typing speed.","Many people ignore typing practice, but it is a very useful skill in todays digital world. It saves time and increases productivity.","Computers have become an essential part of our daily life. From school work to office tasks, everything is now done using digital devices.","Typing regularly helps improve finger speed and coordination. With time, you will notice that your hands move automatically on the keyboard.","Accuracy should always come before speed. If you focus on typing correctly, your speed will automatically increase with practice","While typing, it is important to sit properly and keep your hands relaxed. This helps in avoiding mistakes and increases typing efficiency.","Reading simple paragraphs and typing them again is one of the best ways to practice. It helps in improving both speed and understanding.","Consistency is the key to success in typing. Even practicing for 15 to 20 minutes daily can make a big difference over time.","Sometimes beginners feel frustrated when they make mistakes. However, mistakes are a part of learning and should be taken as an opportunity to improve.","In the end, regular practice and dedication will help you become a confident typist. With time, your speed and accuracy will naturally increase."],
+extreme:["In rapidly evolving digital ecosystem, Developers must continuously refine their problem-solving skills, especially when dealing with unexpected bugs, memory leaks, or inefficient algorithms that degrade system performance over time.","Typing is a useful skill for all We use it in school and work.Practice helps us improve daily.Try to type slowly and correctly.You will get better with time.","Computers are part of our life.Students use them for learning.Typing helps complete work fast.It also saves time and effort.Practice daily for best results","Typing regularly improves your speed.At first, you may feel slow.But practice makes things easier.Focus on accuracy while typing.Speed will increase with time.","Learning typing needs patience.Keep your hands relaxed always.Sit straight and stay focused.Avoid looking at the keyboard.This will improve your skills.","Good typing habits help a lot.Use correct finger placement always.Do not rush while typing fast.Take your time to reduce errors.Slow practice leads to better speed.","Consistency is very important in typing.Short daily practice gives great results.Avoid distractions during your practice time.Focus on both speed and accuracy together.This will improve your typing performance.","Typing without looking is called touch typing.It helps increase your typing efficiency.Your fingers learn key positions over time.Practice regularly to build strong memory.Soon typing will feel natural and easy.","In today’s digital world, typing is essential.Almost every task needs computer skills.A fast typist can work more efficiently.They also make fewer typing mistakes.Regular practice builds speed and confidence.","Improving typing speed takes time and effort.You must practice daily with full focus.Avoid stopping again and again for mistakes.Try to maintain a steady typing rhythm.With patience, your skills will improve greatly."]
+};
+let mode="",level=1,timer,timeLeft;
+
+// START
+window.startGame=function(m){
+mode=m;level=1;score=0;
+document.getElementById("score").innerText=0;
+modePage.classList.add("hidden");
+gamePage.classList.remove("hidden");
+document.getElementById("modeTitle").innerText=mode.toUpperCase();
+loadLevel();
+};
+// LOAD
+function loadLevel(){
+document.getElementById("text").innerText=dataSet[mode][level-1];
+document.getElementById("level").innerText=level;
+timeLeft=mode==="easy"?30:mode==="medium"?45:mode==="hard"?90:150;
+document.getElementById("time").innerText=timeLeft;
+document.getElementById("input").value="";
+clearInterval(timer);
+timer=setInterval(()=>{
+timeLeft--;
+document.getElementById("time").innerText=timeLeft;
+if(timeLeft<=5&&timeLeft>0)beep();
+if(timeLeft===0){
+clearInterval(timer);
+alert("Time up!");
+}
+},1000);
+}
+// INPUT
+document.getElementById("input").addEventListener("input",function(){
+const text=dataSet[mode][level-1];
+const typed=this.value;
+let result="";correctChars=0;
+for(let i=0;i<text.length;i++){
+if(typed[i]==null) result+=text[i];
+else if(typed[i]===text[i]){
+result+=`<span class="correct">${text[i]}</span>`;
+correctChars++;
+}else{
+result+=`<span class="wrong">${text[i]}</span>`;
+}
+}
+totalChars=text.length;
+document.getElementById("text").innerHTML=result;
+document.getElementById("accuracy").innerText=
+Math.floor((correctChars/totalChars)*100);
+});
+// NEXT
+window.nextLevel=function(){
+const input=document.getElementById("input").value.trim();
+const correct=dataSet[mode][level-1].trim();
+if(input!==correct){
+alert("Complete correctly!");
+return;
+}
+score+=mode==="easy"?10:mode==="medium"?20:mode==="hard"?30:50;
+document.getElementById("score").innerText=score;
+if(level<10){
+level++;
+loadLevel();
+}else{
+alert("🎉 Completed!");
+goBack();
+}
+};
+// BACK
+window.goBack=function(){
+clearInterval(timer);
+gamePage.classList.add("hidden");
+modePage.classList.remove("hidden");
+};
+// RESTART
+window.restart=function(){loadLevel();};
+// SOUND
+function beep(){
+const ctx=new(window.AudioContext||window.webkitAudioContext)();
+const osc=ctx.createOscillator();
+osc.connect(ctx.destination);
+osc.start();
+osc.stop(ctx.currentTime+0.1);
+}
+};
+
+</script></body>
+</html>
